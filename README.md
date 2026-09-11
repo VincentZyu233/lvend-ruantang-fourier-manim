@@ -66,3 +66,17 @@ uv run python src/03/render.py
 ```powershell
 uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
 ```
+
+## 🖼️ Grid 对比
+
+### 1️⃣ 静帧线稿出现效果
+
+![01 的九种线稿出现效果](output/01_02_nine_grid.gif)
+
+### 2️⃣ 视频傅里叶轮廓变换
+
+![02 的六种傅里叶轮廓变换](output/02_06abcdef_grid.gif)
+
+### 3️⃣ 视频与 PSD 的原生 Create 展示
+
+![03 的六种视频与 PSD 描线展示](output/03_10abcdef_onionskin_grid.gif)

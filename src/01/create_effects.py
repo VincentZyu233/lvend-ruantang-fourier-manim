@@ -142,7 +142,9 @@ class FourierPathFlash(FourierBase):
         self.setup_assets()
         self.show_fourier_accent()
         flashes = [ShowPassingFlash(path.copy(), time_width=0.22) for path in self.line_art]
-        self.play(LaggedStart(*flashes, lag_ratio=0.11), run_time=4.2)
+        # Keep this compact: the color reveal should not wait behind the final tile.
+        self.play(LaggedStart(*flashes, lag_ratio=0.11), run_time=1.4)
         self.add(self.line_art)
         self.show_colors()
+        self.wait(2.8)
         self.finish()
