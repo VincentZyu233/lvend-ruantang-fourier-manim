@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src"))
+from render_support import burn_labels, create_label_overlay
+
 SOURCE = ROOT / "src" / "01" / "create_effects.py"
 EXTRACT = ROOT / "src" / "01" / "extract_geometry.py"
 MEDIA = ROOT / "build" / "01_media"
@@ -23,6 +26,11 @@ SCENES = (
     ("FourierGrowFromCenter", "01_02g_grow_from_center"),
     ("FourierFadeInParts", "01_02h_fade_in_parts"),
     ("FourierPathFlash", "01_02i_path_flash"),
+)
+LABELS = (
+    "01a Write", "01b Create", "01c PassingFlash",
+    "01d LaggedCreate", "01e BorderThenFill", "01f IncreasingSubsets",
+    "01g GrowFromCenter", "01h FadeInParts", "01i PathFlash",
 )
 
 
@@ -49,12 +57,16 @@ def make_grid(videos: list[Path]) -> Path:
     scaled = ";".join(f"[{index}:v]scale=360:360[v{index}]" for index in range(9))
     tiles = "".join(f"[v{index}]" for index in range(9))
     layout = "|".join(f"{360 * (index % 3)}_{360 * (index // 3)}" for index in range(9))
+    raw_target = ROOT / "build" / "01_nine_grid_unlabeled.mp4"
     target = OUTPUT / "01_02_nine_grid.mp4"
     run(
         "ffmpeg", "-y", *inputs, "-filter_complex",
         f"{scaled};{tiles}xstack=inputs=9:layout={layout}:shortest=0,format=yuv420p[v]",
-        "-map", "[v]", "-r", "20", "-c:v", "libx264", "-crf", "18", str(target),
+        "-map", "[v]", "-r", "20", "-c:v", "libx264", "-crf", "18", str(raw_target),
     )
+    overlay = ROOT / "build" / "01_nine_grid_labels.png"
+    create_label_overlay(overlay, 1080, 1080, 3, LABELS)
+    burn_labels(run, raw_target, overlay, target)
     gif(target)
     return target
 

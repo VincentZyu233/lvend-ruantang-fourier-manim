@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src"))
+from render_support import burn_labels, create_label_overlay
+
 MEDIA = ROOT / "build" / "02_media"
 OUTPUT = ROOT / "output"
 SCENES = (
@@ -18,6 +21,10 @@ SCENES = (
     ("transform_from_copy.py", "CopyMorph", "02_06d_manimce_transform_from_copy"),
     ("move_to_target.py", "TargetMorph", "02_06e_manimce_move_to_target"),
     ("pointwise_function.py", "PointwiseFunctionMorph", "02_06f_manimce_apply_pointwise_function"),
+)
+LABELS = (
+    "02a Transform", "02b MatchingShapes", "02c Replacement",
+    "02d FromCopy", "02e MoveToTarget", "02f Pointwise",
 )
 
 
@@ -41,12 +48,16 @@ def make_grid(videos: list[Path]) -> None:
     inputs = [part for video in videos for part in ("-i", str(video))]
     scaled = ";".join(f"[{index}:v]scale=360:360[v{index}]" for index in range(6))
     tiles = "".join(f"[v{index}]" for index in range(6))
+    raw_target = ROOT / "build" / "02_grid_unlabeled.mp4"
     target = OUTPUT / "02_06abcdef_grid.mp4"
     run(
         "ffmpeg", "-y", *inputs, "-filter_complex",
         f"{scaled};{tiles}xstack=inputs=6:layout=0_0|360_0|720_0|0_360|360_360|720_360:shortest=0,format=yuv420p[v]",
-        "-map", "[v]", "-r", "20", "-c:v", "libx264", "-crf", "18", str(target),
+        "-map", "[v]", "-r", "20", "-c:v", "libx264", "-crf", "18", str(raw_target),
     )
+    overlay = ROOT / "build" / "02_grid_labels.png"
+    create_label_overlay(overlay, 1080, 720, 3, LABELS)
+    burn_labels(run, raw_target, overlay, target)
     gif(target)
 
 
