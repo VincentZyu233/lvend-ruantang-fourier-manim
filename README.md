@@ -1,6 +1,6 @@
 # 🎞️ lvend-ruantang-fourier-manim
 
-[![略nd-某种软糖](https://img.shields.io/static/v1?label=&message=%E7%95%A5nd-%E6%9F%90%E7%A7%8D%E8%BD%AF%E7%B3%96&color=00AEEC&logo=bilibili&logoColor=white&style=flat-square)](https://www.bilibili.com/video/BV1y7QwBgEHc)
+> [▶️ 点击跳转原始素材视频](https://www.bilibili.com/video/BV1y7QwBgEHc) [![略nd-某种软糖](https://img.shields.io/badge/Bilibili-%E7%95%A5nd--%E6%9F%90%E7%A7%8D%E8%BD%AF%E7%B3%96-B7AEC9?logo=bilibili&logoColor=white&labelColor=00AEEC&style=flat-square)](https://www.bilibili.com/video/BV1y7QwBgEHc)
 
 本仓库将一张动画中间帧、视频采样帧与 PSD 分层姿态转成几何轮廓，并用 Manim 重现线稿绘制、傅里叶平滑和姿态展示动画。
 
