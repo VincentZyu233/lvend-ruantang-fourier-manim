@@ -75,10 +75,6 @@ uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
 
 ![01a Write](output/01_02a_write.gif)
 
-#### 🅱️ Create
-
-![01b Create](output/01_02b_create.gif)
-
 ![01 的九种线稿出现效果](output/01_02_nine_grid.gif)
 
 ### 2️⃣ 视频傅里叶轮廓变换
@@ -87,10 +83,6 @@ uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
 
 ![02a Transform](output/02_06a_manimce_transform.gif)
 
-#### 🅱️ TransformMatchingShapes
-
-![02b TransformMatchingShapes](output/02_06b_manimce_transform_matching_shapes.gif)
-
 ![02 的六种傅里叶轮廓变换](output/02_06abcdef_grid.gif)
 
 ### 3️⃣ 视频与 PSD 的原生 Create 展示
@@ -98,10 +90,6 @@ uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
 #### 🅰️ Video Single
 
 ![03a Video Single](output/03_10a_video_single.gif)
-
-#### 🅱️ Video Layered
-
-![03b Video Layered](output/03_10b_video_layered.gif)
 
 ![03 的六种视频与 PSD 描线展示](output/03_10abcdef_onionskin_grid.gif)
 

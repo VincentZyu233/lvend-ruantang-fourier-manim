@@ -7,6 +7,8 @@ __pycache__/
 # Manim render intermediates and reproducible working data
 media/
 build/
+
+tmp/
 temp/
 
 # Tool and test caches
