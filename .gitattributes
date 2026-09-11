@@ -1,7 +1,7 @@
-# Count documentation in GitHub's language statistics.
-*.md linguist-detectable=true
+# 📊 将所有 Markdown 视为可统计的非文档文件，纳入 GitHub 语言统计。
+*.md linguist-detectable=true linguist-documentation=false
 
-# Preserve binary deliverables exactly.
+# 📦 保持二进制成品原样存储。
 *.mp4 binary
 *.gif binary
 *.png binary
