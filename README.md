@@ -1,4 +1,4 @@
-# 🎞️ Fourier Manim Study
+# 🎞️ lvend-ruantang-fourier-manim
 
 本仓库将一张动画中间帧、视频采样帧与 PSD 分层姿态转成几何轮廓，并用 Manim 重现线稿绘制、傅里叶平滑和姿态展示动画。
 
