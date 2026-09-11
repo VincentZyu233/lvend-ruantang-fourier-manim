@@ -1,0 +1,22 @@
+# Local Python environments and package caches
+.venv/
+.venv-*/
+__pycache__/
+*.py[cod]
+
+# Manim render intermediates and reproducible working data
+media/
+build/
+temp/
+
+# Tool and test caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+README.local.md
+
+# An unrelated source-video reference; the three inputs used by src/ are below.
+素材捏/*.mp4
+素材捏/略ndoc的软糖动画/置顶评论.txt
+
+# Keep output/ and 素材捏/ tracked: a fresh clone must render without external files.

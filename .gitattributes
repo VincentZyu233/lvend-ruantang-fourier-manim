@@ -1,0 +1,8 @@
+# Count documentation in GitHub's language statistics.
+*.md linguist-detectable=true
+
+# Preserve binary deliverables exactly.
+*.mp4 binary
+*.gif binary
+*.png binary
+*.psd binary
