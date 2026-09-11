@@ -22,7 +22,9 @@ sudo dnf install ffmpeg
 
 # Arch Linux
 sudo pacman -S ffmpeg
+```
 
+```bash
 # macOS
 brew install ffmpeg
 ```
@@ -30,8 +32,8 @@ brew install ffmpeg
 安装后确认 `ffmpeg -version` 可运行。
 
 ```powershell
-git clone <repository-url>
-cd 20260910傅里叶变换
+git clone https://github.com/VincentZyu233/lvend-ruantang-fourier-manim.git
+cd lvend-ruantang-fourier-manim
 uv venv --python 3.13
 uv sync
 uv run python -c "import manim, cv2, psd_tools; print(manim.__version__)"
