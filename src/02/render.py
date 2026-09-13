@@ -65,7 +65,8 @@ def main() -> None:
     OUTPUT.mkdir(exist_ok=True)
     videos: list[Path] = []
     for filename, scene, stem in SCENES:
-        run(sys.executable, "-m", "manim", "--format=mp4", "--media_dir", str(MEDIA), "-r", "720,720", "--fps", "20", str(ROOT / "src" / "02" / filename), scene)
+        # Rebuild all partial movies so the output reflects the current timing.
+        run(sys.executable, "-m", "manim", "--disable_caching", "--format=mp4", "--media_dir", str(MEDIA), "-r", "720,720", "--fps", "20", str(ROOT / "src" / "02" / filename), scene)
         target = OUTPUT / f"{stem}.mp4"
         shutil.copy2(newest_scene(scene), target)
         gif(target)

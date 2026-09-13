@@ -13,6 +13,14 @@ import numpy as np
 PROJECT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = PROJECT / "素材捏" / "略ndoc的软糖动画" / "midpoint.png"
 DEFAULT_OUTPUT = PROJECT / "build" / "01_geometry"
+SATURATION_FACTOR = 1.28
+
+
+def boost_saturation_bgr(image: np.ndarray, factor: float = SATURATION_FACTOR) -> np.ndarray:
+    """Increase painted colours without changing luminance or alpha masks."""
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hsv[:, :, 1] = np.uint8(np.clip(hsv[:, :, 1].astype(np.float32) * factor, 0, 255))
+    return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 
 def resample_closed_curve(points: np.ndarray, count: int) -> np.ndarray:
@@ -75,7 +83,7 @@ def save_color_layers(image: np.ndarray, ink: np.ndarray, output: Path, clusters
     for cluster in range(clusters):
         cluster_mask = np.zeros(image.shape[:2], dtype=bool)
         cluster_mask.reshape(-1)[coordinates[labels.ravel() == cluster]] = True
-        rgba = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
+        rgba = cv2.cvtColor(boost_saturation_bgr(image), cv2.COLOR_BGR2BGRA)
         rgba[:, :, 3] = np.where(cluster_mask, 255, 0).astype(np.uint8)
         filename = f"color_{cluster:02d}.png"
         cv2.imwrite(str(output / filename), rgba)

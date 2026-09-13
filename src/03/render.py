@@ -66,7 +66,10 @@ def main() -> None:
     OUTPUT.mkdir(exist_ok=True)
     videos: list[Path] = []
     for scene, stem in SCENES:
-        run(sys.executable, "-m", "manim", "--format=mp4", "--media_dir", str(MEDIA), "-r", "720,720", "--fps", "20", str(SOURCE), scene)
+        # The source-video raster and PSD registration are computed at runtime;
+        # bypass Manim's partial-movie cache so an invocation always reflects
+        # the current extraction and alignment code.
+        run(sys.executable, "-m", "manim", "--disable_caching", "--format=mp4", "--media_dir", str(MEDIA), "-r", "720,720", "--fps", "20", str(SOURCE), scene)
         target = OUTPUT / f"{stem}.mp4"
         shutil.copy2(newest_scene(scene), target)
         gif(target)

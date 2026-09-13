@@ -32,4 +32,3 @@ class CopyMorph(Scene):
             )
             self.play(FadeIn(target_color), run_time=0.25)
             current_color = target_color
-        self.wait(11.117)

@@ -34,4 +34,3 @@ class PointwiseFunctionMorph(Scene):
 
             self.play(ApplyPointwiseFunction(ripple, drawing), run_time=0.85)
             self.play(Restore(drawing), run_time=0.75)
-        self.wait(12.617)

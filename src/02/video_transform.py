@@ -8,6 +8,7 @@ between poses.
 
 from __future__ import annotations
 
+import colorsys
 from pathlib import Path
 
 import cv2
@@ -18,6 +19,8 @@ from manim import (
     Create,
     FadeIn,
     FadeOut,
+    Group,
+    ImageMobject,
     LaggedStart,
     Scene,
     Transform,
@@ -32,6 +35,7 @@ VIDEO_PATH = PROJECT / "素材捏" / "略ndoc的软糖动画" / "某种软糖.mp
 ARTIFACT_DIR = PROJECT / "build" / "02_video_fourier"
 SAMPLE_TIMES = (0.55, 2.0, 3.45, 4.9, 6.35)
 PATH_COUNT = 12
+SATURATION_FACTOR = 1.28
 
 config.pixel_width = 720
 config.pixel_height = 720
@@ -115,13 +119,61 @@ def polygon_from_contour(contour: np.ndarray, width: int, height: int, color: st
         (0.5 - curve[:, 1] / height) * 7.45,
         np.zeros(len(curve)),
     ))
-    block = VMobject(fill_color=color, fill_opacity=1, stroke_opacity=0)
+    block = VMobject(fill_color=boost_hex_color(color), fill_opacity=1, stroke_opacity=0)
     block.set_points_smoothly(np.vstack((scene_points, scene_points[0])))
     return block
 
 
-def color_blocks(frame: np.ndarray) -> VGroup:
-    """Build clean, flat color polygons while leaving hair and ink to the line art."""
+def boost_hex_color(color: str, factor: float = SATURATION_FACTOR) -> str:
+    """Apply the study-wide palette boost while leaving black and white intact."""
+    red, green, blue = (int(color[index:index + 2], 16) / 255 for index in (1, 3, 5))
+    hue, saturation, value = colorsys.rgb_to_hsv(red, green, blue)
+    red, green, blue = colorsys.hsv_to_rgb(hue, min(1.0, saturation * factor), value)
+    return "#%02X%02X%02X" % tuple(round(channel * 255) for channel in (red, green, blue))
+
+
+def clean_color_rgba(frame: np.ndarray, *, include_soft_shadows: bool = True) -> np.ndarray:
+    """Extract source-faithful fills as a transparent raster."""
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    saturation, value = hsv[:, :, 1], hsv[:, :, 2]
+    grayscale = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
+
+    # Preserve original flat colours plus the soft violet/grey shadow language,
+    # while cutting away the white paper and pale corner watermark.
+    colour_fill = (saturation >= 11) & (value < 250) & (grayscale >= 92)
+    soft_shadow = (saturation >= 4) & (value < 230) & (grayscale >= 125)
+    if not include_soft_shadows:
+        soft_shadow = np.zeros_like(soft_shadow)
+
+    # Keep thick black artwork (eyebrows, eyes and shoes) by measuring ink
+    # thickness, instead of requiring it to be a disconnected component.  A
+    # brow often touches nearby line art after H.264 compression, which made
+    # the former connected-component rule incorrectly discard it.
+    dark_ink = (grayscale < 70).astype(np.uint8)
+    ink_thickness = cv2.distanceTransform(dark_ink, cv2.DIST_L2, 5)
+    solid_core = (ink_thickness >= 3.25).astype(np.uint8) * 255
+    solid_detail = cv2.dilate(
+        solid_core,
+        cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)),
+    ).astype(bool) & dark_ink.astype(bool)
+
+    boosted = hsv.copy()
+    boosted[:, :, 1] = np.minimum(255, boosted[:, :, 1].astype(np.float32) * 1.12).astype(np.uint8)
+    return np.dstack((
+        cv2.cvtColor(boosted, cv2.COLOR_HSV2RGB),
+        np.where(colour_fill | soft_shadow | solid_detail, 255, 0).astype(np.uint8),
+    ))
+
+
+def clean_color_raster(frame: np.ndarray, *, include_soft_shadows: bool = True) -> Group:
+    """Convert the transparent source-fidelity raster to a Manim colour layer."""
+    rgba = clean_color_rgba(frame, include_soft_shadows=include_soft_shadows)
+    return Group(ImageMobject(rgba).set_height(7.45).set_z_index(-1))
+
+
+def color_polygons(frame: np.ndarray) -> VGroup:
+    """Retained for geometry inspection; rendered scenes use source rasters."""
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hue, saturation, value = (hsv[:, :, index] for index in range(3))
     unassigned = np.ones(hue.shape, dtype=bool)
@@ -154,7 +206,6 @@ def color_blocks(frame: np.ndarray) -> VGroup:
             continue
         median = np.median(pixels, axis=0).astype(np.uint8)
         accent_hsv = cv2.cvtColor(median.reshape(1, 1, 3), cv2.COLOR_BGR2HSV)
-        accent_hsv[0, 0, 1] = min(255, int(accent_hsv[0, 0, 1] * 1.2))
         accent_rgb = cv2.cvtColor(accent_hsv, cv2.COLOR_HSV2RGB)[0, 0]
         blocks.add(polygon_from_contour(contour, width, height, "#%02X%02X%02X" % tuple(accent_rgb)))
 
@@ -178,6 +229,11 @@ def color_blocks(frame: np.ndarray) -> VGroup:
         for contour in contours:
             blocks.add(polygon_from_contour(contour, width, height, "#171717"))
     return blocks.set_z_index(-1)
+
+
+def color_blocks(frame: np.ndarray) -> Group:
+    """Use a clean masked source layer instead of fragmented colour polygons."""
+    return clean_color_raster(frame)
 
 
 def reorder_for_transform(previous: list[np.ndarray], current: list[np.ndarray]) -> list[np.ndarray]:
@@ -210,12 +266,17 @@ def to_smooth_vmobject(points: np.ndarray, width: int, height: int) -> VMobject:
     return path
 
 
-def build_poses() -> tuple[list[VGroup], list[VGroup]]:
-    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+def build_poses(
+    *,
+    sample_times: tuple[float, ...] = SAMPLE_TIMES,
+    artifact_dir: Path = ARTIFACT_DIR,
+) -> tuple[list[VGroup], list[VGroup]]:
+    """Extract video poses with optional callers' sampling and cache locations."""
+    artifact_dir.mkdir(parents=True, exist_ok=True)
     capture = cv2.VideoCapture(str(VIDEO_PATH))
     if not capture.isOpened():
         raise FileNotFoundError(VIDEO_PATH)
-    frames = [read_frame(capture, seconds) for seconds in SAMPLE_TIMES]
+    frames = [read_frame(capture, seconds) for seconds in sample_times]
     capture.release()
     height, width = frames[0].shape[:2]
 
@@ -226,7 +287,7 @@ def build_poses() -> tuple[list[VGroup], list[VGroup]]:
 
     colors = []
     for index, frame in enumerate(frames, start=1):
-        cv2.imwrite(str(ARTIFACT_DIR / f"sample_{index:02d}.png"), frame)
+        cv2.imwrite(str(artifact_dir / f"sample_{index:02d}.png"), frame)
         colors.append(color_blocks(frame))
 
     line_groups = [VGroup(*[
@@ -258,5 +319,3 @@ class VideoFourierSmoothTransform(Scene):
             )
             self.play(FadeIn(target_color), run_time=0.25)
             current_color = target_color
-        # Keep the original 19.70-second presentation duration after the faster action.
-        self.wait(12.442)
