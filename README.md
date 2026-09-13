@@ -4,7 +4,7 @@
 
 本仓库将一张动画中间帧、视频采样帧与 PSD 分层姿态转成几何轮廓，并用 Manim 重现线稿绘制、傅里叶平滑和姿态展示动画。
 
-`output/` 是已提交的成品。它既包含每个单片的 MP4/GIF，也包含每组的 grid；所有文件名前的 `01_`、`02_`、`03_` 分别对应下列源码实验。
+`output/` 按版本整理成品：`output/no_captioned/` 是 01-03 直接渲染的本地无字幕原版，已被 Git 忽略；`output/captioned/` 是在不改变原动画的前提下增加底部说明栏的提交版。所有文件名前的 `01_`、`02_`、`03_` 分别对应下列源码实验。
 
 ## 🧰 环境
 
@@ -45,7 +45,7 @@ uv run python -c "import manim, cv2, psd_tools; print(manim.__version__)"
 
 ## ▶️ 复现
 
-以下命令会覆盖根目录 `output/` 中对应编号的单片、MP4/GIF 和 grid。Manim 的中间帧与提取数据写入被忽略的 `build/`，不会污染 Git。
+以下命令会覆盖 `output/no_captioned/` 中对应编号的单片、MP4/GIF 和 grid。Manim 的中间帧与提取数据写入被忽略的 `build/`，不会污染 Git。
 
 ```powershell
 uv run python src/01/render.py
@@ -54,6 +54,14 @@ uv run python src/03/render.py
 ```
 
 渲染质量与已提交成品一致：单片为 720x720、20 FPS；01 的 grid 为 1080x1080，02/03 的 grid 为 1080x720。完整生成需要一些时间，尤其是 02 的高采样傅里叶曲线。
+
+字幕包装不重渲染 Manim scene，而是从上面的原始产物生成独立版本。安装 [霞鹜文楷](https://github.com/lxgw/LxgwWenKai) 后传入 Medium 字体文件路径：
+
+```powershell
+uv run python src/captioned/render.py --font "<LXGWWenKai-Medium.ttf 的绝对路径>"
+```
+
+增加 `--bili` 会同时在被忽略的 `output/bili/` 生成配乐成片。该成片依赖本地 BGM 文件，默认路径为 `output/music/哀の隙間-mimi.flac`。
 
 ## 🗂️ 源码索引
 
@@ -64,8 +72,9 @@ uv run python src/03/render.py
 | `src/01/` | `midpoint.png` | 9 种线稿出现效果 | 3x3 | 阈值轮廓、K-means 色块、单条轮廓的 DFT 重建 |
 | `src/02/` | `某种软糖.mp4` | 6 种姿态变换效果 | 3x2 | 五帧采样、轮廓重采样、FFT 平滑、Manim 变换 |
 | `src/03/` | 视频和 `1775818328351.psd` | 6 种描线姿态展示 | 3x2 | 原生 `Create`、onion skin、PSD 图层组轮廓 |
+| `src/captioned/` | `output/no_captioned/` 原始成片 | 21 段单片 | 3 个 grid | 霞鹜文楷底部说明栏、FFmpeg 成片拼接 |
 
-每个 `render.py` 都将自己的 scene 输出到根 `output/`，用 `ffmpeg` 同时制作 GIF 和 grid。若只想调试某一个 scene，可直接调用 Manim，例如：
+01-03 的每个 `render.py` 都将自己的 scene 输出到 `output/no_captioned/`，用 `ffmpeg` 同时制作 GIF 和 grid；`src/captioned/render.py` 再将它们包装为带字幕版本。若只想调试某一个 scene，可直接调用 Manim，例如：
 
 ```powershell
 uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
@@ -77,24 +86,24 @@ uv run manim src/02/video_transform.py VideoFourierSmoothTransform -pql
 
 #### 🅰️ Write
 
-![01a Write](output/01_02a_write.gif)
+![01a Write 字幕版](output/captioned/01_02a_write.gif)
 
-![01 的九种线稿出现效果](output/01_02_nine_grid.gif)
+![01 的九种线稿出现效果 字幕版](output/captioned/01_02_nine_grid.gif)
 
 ### 2️⃣ 视频傅里叶轮廓变换
 
 #### 🅰️ Transform
 
-![02a Transform](output/02_06a_manimce_transform.gif)
+![02a Transform 字幕版](output/captioned/02_06a_manimce_transform.gif)
 
-![02 的六种傅里叶轮廓变换](output/02_06abcdef_grid.gif)
+![02 的六种傅里叶轮廓变换 字幕版](output/captioned/02_06abcdef_grid.gif)
 
 ### 3️⃣ 视频与 PSD 的原生 Create 展示
 
 #### 🅰️ Video Single
 
-![03a Video Single](output/03_10a_video_single.gif)
+![03a Video Single 字幕版](output/captioned/03_10a_video_single.gif)
 
-![03 的六种视频与 PSD 描线展示](output/03_10abcdef_onionskin_grid.gif)
+![03 的六种视频与 PSD 描线展示 字幕版](output/captioned/03_10abcdef_onionskin_grid.gif)
 
-更多单片、MP4 与 GIF 请查看仓库内的 [output/](output/) 文件夹。
+更多已提交的字幕版 MP4/GIF 请查看仓库内的 [output/captioned/](output/captioned/) 文件夹；本机执行渲染后可在 `output/no_captioned/` 查看无字幕原版。

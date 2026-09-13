@@ -14,7 +14,7 @@ from render_support import burn_labels, create_label_overlay
 
 SOURCE = ROOT / "src" / "03" / "onion_skin_create.py"
 MEDIA = ROOT / "build" / "03_media"
-OUTPUT = ROOT / "output"
+OUTPUT = ROOT / "output" / "no_captioned"
 SCENES = (
     ("Flow10aVideoSingle", "03_10a_video_single"),
     ("Flow10bVideoLayered", "03_10b_video_layered"),

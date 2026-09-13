@@ -15,7 +15,7 @@ from render_support import burn_labels, create_label_overlay
 SOURCE = ROOT / "src" / "01" / "create_effects.py"
 EXTRACT = ROOT / "src" / "01" / "extract_geometry.py"
 MEDIA = ROOT / "build" / "01_media"
-OUTPUT = ROOT / "output"
+OUTPUT = ROOT / "output" / "no_captioned"
 SCENES = (
     ("FourierWrite", "01_02a_write"),
     ("FourierCreate", "01_02b_create"),

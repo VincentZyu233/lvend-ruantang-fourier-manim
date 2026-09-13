@@ -8,6 +8,12 @@ __pycache__/
 media/
 build/
 
+# 📺 最终 Bili 成片仅作为 Release 附件，不进入 Git 历史
+output/bili/
+
+# 🎞️ 无字幕原始渲染可本地复现，仓库仅保留带字幕展示版
+output/no_captioned/
+
 tmp/
 temp/
 

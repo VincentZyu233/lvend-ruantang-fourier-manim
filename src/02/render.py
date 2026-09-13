@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from render_support import burn_labels, create_label_overlay
 
 MEDIA = ROOT / "build" / "02_media"
-OUTPUT = ROOT / "output"
+OUTPUT = ROOT / "output" / "no_captioned"
 SCENES = (
     ("video_transform.py", "VideoFourierSmoothTransform", "02_06a_manimce_transform"),
     ("matching_shapes.py", "MatchingShapesMorph", "02_06b_manimce_transform_matching_shapes"),
