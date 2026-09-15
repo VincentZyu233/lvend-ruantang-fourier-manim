@@ -37,10 +37,11 @@ def burn_labels(
     video: Path,
     overlay: Path,
     target: Path,
+    fps: int = 20,
 ) -> None:
     """Burn a static Pillow overlay onto a rendered grid without platform fonts."""
     run(
         "ffmpeg", "-y", "-i", str(video), "-loop", "1", "-i", str(overlay),
         "-filter_complex", "[0:v][1:v]overlay=0:0:shortest=1,format=yuv420p[v]",
-        "-map", "[v]", "-r", "20", "-c:v", "libx264", "-crf", "18", str(target),
+        "-map", "[v]", "-r", str(fps), "-c:v", "libx264", "-crf", "18", str(target),
     )

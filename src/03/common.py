@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import colorsys
+import os
 import runpy
 from pathlib import Path
 
@@ -422,11 +423,12 @@ def flood_colors(scene: Scene, colors: VGroup, run_time: float = 0.9) -> None:
 
 
 def configure_canvas() -> None:
-    config.pixel_width = 720
-    config.pixel_height = 720
+    scale = int(os.environ.get("FOURIER_RENDER_SCALE", "1"))
+    config.pixel_width = 720 * scale
+    config.pixel_height = 720 * scale
     config.frame_width = 8
     config.frame_height = 8
-    config.frame_rate = 20
+    config.frame_rate = int(os.environ.get("FOURIER_RENDER_FPS", "20"))
     config.background_color = "#FFFFFF"
 
 

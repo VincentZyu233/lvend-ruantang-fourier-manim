@@ -11,6 +11,11 @@ build/
 # 📺 最终 Bili 成片仅作为 Release 附件，不进入 Git 历史
 output/bili/
 
+# 🎞️ 高规格 MP4 仅作为 Release 附件；仓库展示仅保留 GIF
+output/high/
+output/captioned/*.mp4
+output/music/
+
 # 🎞️ 无字幕原始渲染可本地复现，仓库仅保留带字幕展示版
 output/no_captioned/
 
@@ -22,5 +27,9 @@ temp/
 .mypy_cache/
 .ruff_cache/
 README.local.md
+AGENTS.local.md
 
 # 📦 保留 output/ 与 素材捏/：新 clone 必须可直接复现。
+
+# 🎵 本地音乐素材体积较大；曲目表仍保留在 Git
+素材捏/music/*.flac

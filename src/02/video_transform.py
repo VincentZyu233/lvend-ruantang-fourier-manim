@@ -9,6 +9,7 @@ between poses.
 from __future__ import annotations
 
 import colorsys
+import os
 from pathlib import Path
 
 import cv2
@@ -37,11 +38,12 @@ SAMPLE_TIMES = (0.55, 2.0, 3.45, 4.9, 6.35)
 PATH_COUNT = 12
 SATURATION_FACTOR = 1.28
 
-config.pixel_width = 720
-config.pixel_height = 720
+RENDER_SCALE = int(os.environ.get("FOURIER_RENDER_SCALE", "1"))
+config.pixel_width = 720 * RENDER_SCALE
+config.pixel_height = 720 * RENDER_SCALE
 config.frame_width = 8
 config.frame_height = 8
-config.frame_rate = 20
+config.frame_rate = int(os.environ.get("FOURIER_RENDER_FPS", "20"))
 config.background_color = WHITE
 
 

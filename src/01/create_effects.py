@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -12,11 +13,12 @@ from manim import BLACK, WHITE, Create, DrawBorderThenFill, FadeIn, Group, GrowF
 PROJECT = Path(__file__).resolve().parents[2]
 ASSETS = PROJECT / "build" / "01_geometry"
 SOURCE = PROJECT / "素材捏" / "略ndoc的软糖动画" / "midpoint.png"
-config.pixel_width = 720
-config.pixel_height = 720
+RENDER_SCALE = int(os.environ.get("FOURIER_RENDER_SCALE", "1"))
+config.pixel_width = 720 * RENDER_SCALE
+config.pixel_height = 720 * RENDER_SCALE
 config.frame_width = 8
 config.frame_height = 8
-config.frame_rate = 20
+config.frame_rate = int(os.environ.get("FOURIER_RENDER_FPS", "20"))
 config.background_color = WHITE
 
 
